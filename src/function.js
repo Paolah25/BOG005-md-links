@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const chalk = require('chalk')
-const marked = require('marked')
+const {marked} = require('marked')
 console.log(chalk.blue('Hola'));
 const routerTheFiles = "carpetadePruebas";
 
@@ -16,7 +16,7 @@ const absolutePath = (router) => {
 
 }
 
-//console.log(absolutePath(routerTheFiles));
+// console.log(absolutePath(routerTheFiles),19);
 
 
 function getMDfilesorDirectories(allFileMD) {
@@ -49,10 +49,11 @@ function getMDfilesorDirectories(allFileMD) {
 }
 
 const readMds = (file) => {
- 
   return new Promise((resolve, reject) => {
     let arrayObjects = [];
-    fs.readFile(file, 'utf8', (err, datafile) => {
+    fs.readFile(file, 'utf8', (err, info) => {
+      // console.log(file,62);
+      // console.log(info,63);
       if (err) { resolve(err) };
       const renderer = new marked.Renderer()
       renderer.link = function (href, title, text) {
@@ -65,8 +66,7 @@ const readMds = (file) => {
           arrayObjects.push(objectContainer);
         }
       }
-      marked.marked(datafile,
-        { renderer })
+      marked(info,{ renderer })
 
       resolve(arrayObjects);
     });
@@ -80,7 +80,7 @@ const readMds = (file) => {
 // console.log(resolveAllItems("src/carpetadePruebas"));
 
 //const containerArray = readMds("src/carpetadePruebas");
- readMds("src/carpetadePruebas/prueba.md").then((val) => { console.log("probando", val) })
+ readMds("C:/Users/famil/BOG005-md-links/src/carpetadePruebas/prueba.md").then((val) => { console.log("probando", val) })
 //console.log(containerArray);
 
 module.exports = { absolutePath, getMDfilesorDirectories }
