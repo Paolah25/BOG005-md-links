@@ -1,11 +1,12 @@
 const fs = require('fs')
 const path = require('path')
 const chalk = require('chalk')
-const {marked} = require('marked')
+const { marked } = require('marked')
+const axios = require('axios');
 console.log(chalk.blue('Hola'));
 const routerTheFiles = "carpetadePruebas";
 
-
+// Pasar ruta relativa a ruta absoluta
 const absolutePath = (router) => {
   if (path.isAbsolute(router)) {
     return router;
@@ -18,6 +19,7 @@ const absolutePath = (router) => {
 
 // console.log(absolutePath(routerTheFiles),19);
 
+// Funcion recursiva
 
 function getMDfilesorDirectories(allFileMD) {
   const isFile = fs.statSync(allFileMD).isFile();
@@ -47,13 +49,12 @@ function getMDfilesorDirectories(allFileMD) {
   }
   return arrayMarkDown; // Retornando un array de archivos MD 
 }
+// Lectura de archivos md
 
 const readMds = (file) => {
   return new Promise((resolve, reject) => {
     let arrayObjects = [];
     fs.readFile(file, 'utf8', (err, info) => {
-      // console.log(file,62);
-      // console.log(info,63);
       if (err) { resolve(err) };
       const renderer = new marked.Renderer()
       renderer.link = function (href, title, text) {
@@ -66,22 +67,29 @@ const readMds = (file) => {
           arrayObjects.push(objectContainer);
         }
       }
-      marked(info,{ renderer })
+      marked(info, { renderer })
 
       resolve(arrayObjects);
     });
   })
 }
-// const resolveAllItems = (arraysMD) => {
-//   const returnPromise = arraysMD.map(file => readMds(file));
-//   return Promise.all(returnPromise).then(res => res.flat());
 
-// }
-// console.log(resolveAllItems("src/carpetadePruebas"));
-
-//const containerArray = readMds("src/carpetadePruebas");
- readMds("C:/Users/famil/BOG005-md-links/src/carpetadePruebas/prueba.md").then((val) => { console.log("probando", val) })
+readMds("C:/Users/famil/BOG005-md-links/src/carpetadePruebas/prueba.md").then((val) => { console.log("probando", val) })
 //console.log(containerArray);
 
+function validateArray(arrayObjects) {
+  const arrayObjectsMod = arrayObjects.map((obj) => {
+    return axios(obj.href)
+      .then((res) => {
+        // console.log(res.status, res.statusText, 84);
+        return {status: res.status, msj: 'OK'}
+      })
+  })
+
+  return Promise.all(arrayObjectsMod).then(res=>res)
+}
+readMds("C:/Users/famil/BOG005-md-links/src/carpetadePruebas/prueba.md").then((val) => {
+  validateArray(val).then(resultado => console.log(resultado, 'esto es lo validado'));
+  })
 module.exports = { absolutePath, getMDfilesorDirectories }
 
