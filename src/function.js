@@ -1,9 +1,8 @@
 const fs = require('fs')
 const path = require('path')
 const chalk = require('chalk')
-const { marked } = require('marked')
+const {marked}  = require('marked')
 const axios = require('axios');
-console.log(chalk.blue('Hola'));
 const routerTheFiles = "carpetadePruebas";
 
 // Pasar ruta relativa a ruta absoluta
@@ -74,22 +73,30 @@ const readMds = (file) => {
   })
 }
 
-readMds("C:/Users/famil/BOG005-md-links/src/carpetadePruebas/prueba.md").then((val) => { console.log("probando", val) })
+// readMds("C:/Users/famil/BOG005-md-links/src/carpetadePruebas/prueba.md").then((val) => { console.log("probando", val.flat()) })
 //console.log(containerArray);
 
 function validateArray(arrayObjects) {
   const arrayObjectsMod = arrayObjects.map((obj) => {
-    return axios(obj.href)
+    return axios.get(obj.href)
       .then((res) => {
+        obj.status= res.status; 
+        obj.mensaje= "OK"; 
         // console.log(res.status, res.statusText, 84);
-        return {status: res.status, msj: 'OK'}
+        return obj; 
       })
+
+      .catch((error => {
+         obj.status = 404; 
+         obj.mensaje= "ERROR";  
+         return obj; 
+      }))
   })
 
   return Promise.all(arrayObjectsMod).then(res=>res)
-}
-readMds("C:/Users/famil/BOG005-md-links/src/carpetadePruebas/prueba.md").then((val) => {
-  validateArray(val).then(resultado => console.log(resultado, 'esto es lo validado'));
-  })
-module.exports = { absolutePath, getMDfilesorDirectories }
+ }
+// readMds("C:/Users/famil/BOG005-md-links/src/carpetadePruebas/prueba.md").then((val) => {
+//   validateArray(val).then(resultado => console.log(resultado, 'esto es lo validado'));
+//   })
+module.exports = { absolutePath, getMDfilesorDirectories, readMds, validateArray }
 
